@@ -2,6 +2,11 @@
 
 comment "GCC Options"
 
+config BR2_LINARO_GCC
+	depends on BR2_arm
+	bool "Enable linaro's gcc selection"
+	help
+	  Enable linaro's arm optimize gcc.
 choice
 	prompt "GCC compiler Version"
 	default BR2_GCC_VERSION_4_5_X if !BR2_avr32 && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8
@@ -37,6 +42,18 @@ choice
 	config BR2_GCC_VERSION_SNAP
 		depends on !BR2_avr32 && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8
 		bool "gcc snapshot"
+
+	config BR2_LINARO_GCC_VERSION_4_5_X
+		depends on BR2_LINARO_GCC
+		bool "linaro's gcc 4.5.x"
+
+	config BR2_LINARO_GCC_VERSION_4_6_X
+		depends on BR2_LINARO_GCC
+		bool "linaro's gcc 4.6.x"
+
+	config BR2_LINARO_GCC_VERSION_4_7_X
+		depends on BR2_LINARO_GCC
+		bool "linaro's gcc 4.7.x"
 endchoice
 
 config BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE
@@ -62,10 +79,20 @@ config BR2_GCC_VERSION
 	default "4.2.2-avr32-2.1.5" if BR2_GCC_VERSION_4_2_2_AVR32_2_1_5
 	default "4.3.6"     if BR2_GCC_VERSION_4_3_X
 	default "4.4.7"     if BR2_GCC_VERSION_4_4_X
-	default "4.5.4"     if BR2_GCC_VERSION_4_5_X
-	default "4.6.3"     if BR2_GCC_VERSION_4_6_X
-	default "4.7.1"     if BR2_GCC_VERSION_4_7_X
+	default "4.5.4"     if BR2_GCC_VERSION_4_5_X || BR2_LINARO_GCC_VERSION_4_5_X
+	default "4.6.3"     if BR2_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_6_X
+	default "4.7.1"     if BR2_GCC_VERSION_4_7_X || BR2_LINARO_GCC_VERSION_4_7_X
 	default $BR2_GCC_SNAP_DATE if BR2_GCC_VERSION_SNAP
+
+config BR2_LINARO_GCC_VERSION
+	string
+	default "4.5"     if BR2_LINARO_GCC_VERSION_4_5_X
+	default "4.6"     if BR2_LINARO_GCC_VERSION_4_6_X
+	default "4.7"     if BR2_LINARO_GCC_VERSION_4_7_X
+
+config BR2_LINARO_RELEASE
+	string
+	default "2012.07"     if BR2_LINARO_GCC_VERSION_4_5_X || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X
 
 config BR2_EXTRA_GCC_CONFIG_OPTIONS
 	string "Additional gcc options"
@@ -103,6 +130,20 @@ config BR2_GCC_ENABLE_TLS
 	help
 	  Enable the compiler to generate code for accessing
 	  thread local storage variables
+
+config BR2_GCC_ENABLE_LTO
+        bool "Enable compiler lto support"
+	default y
+        depends on BR2_GCC_VERSION_4_6_X || BR2_GCC_VERSION_4_7_X || BR2_GCC_VERSION_SNAP || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X
+        help
+          Enable Link Time Optimization support for the compiler
+	  Need libelf v0.8.12 or newer installed on host system
+
+config BR2_GCC_ENABLE_GRAPHITE
+        bool "Enable compiler graphite support"
+        depends on BR2_GCC_VERSION_4_6_X || BR2_GCC_VERSION_4_7_X || BR2_GCC_VERSION_SNAP || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X
+        help
+          Enable Graphite support for the compiler
 
 config BR2_GCC_ENABLE_OPENMP
 	bool "Enable compiler OpenMP support"

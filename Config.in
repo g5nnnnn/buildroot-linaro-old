@@ -390,6 +390,13 @@ config BR2_OPTIMIZE_S
 	  -freorder-blocks -freorder-blocks-and-partition -fprefetch-loop-arrays
 	  -ftree-vect-loop-version
 
+config BR2_OPTIMIZE_FAST
+        bool "optimize for fast"
+        help
+          Disregard strict standards compliance. -Ofast enables all
+	  -O3 optimizations. It also enables optimizations that are not valid
+	  for all standard compliant programs. It turns on -ffast-math
+
 endchoice
 
 config BR2_PREFER_STATIC_LIB

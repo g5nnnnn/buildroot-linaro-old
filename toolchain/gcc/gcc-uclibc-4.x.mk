@@ -29,6 +29,8 @@ ifneq ($(GCC_SNAP_DATE),)
  GCC_SITE:=ftp://sources.redhat.com/pub/gcc/snapshots/$(GCC_VERSION)
 else ifeq ($(findstring avr32,$(GCC_VERSION)),avr32)
  GCC_SITE:=ftp://www.at91.com/pub/buildroot/
+else ifneq ($(BR2_LINARO_RELEASE),)
+ GCC_SITE:=http://launchpad.net/gcc-linaro/$(BR2_LINARO_GCC_VERSION)/$(BR2_LINARO_GCC_VERSION)-$(BR2_LINARO_RELEASE)/+download/
 else
  GCC_SITE:=$(BR2_GNU_MIRROR)/gcc/gcc-$(GCC_VERSION)
 endif
@@ -38,9 +40,17 @@ include target/xtensa/patch.in
 GCC_PATCH_EXTRA:=$(call XTENSA_PATCH,gcc,$(GCC_PATCH_DIR),. ..)
 endif
 
-GCC_SOURCE:=gcc-$(GCC_VERSION).tar.bz2
-GCC_PATCH_DIR:=toolchain/gcc/$(GCC_VERSION)
-GCC_DIR:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)
+ifneq ($(BR2_LINARO_RELEASE),)
+ LINARO_GCC_VERSION:=$(call qstrip,$(BR2_LINARO_GCC_VERSION))
+ LINARO_RELEASE:=$(call qstrip,$(BR2_LINARO_RELEASE))
+ GCC_SOURCE:=gcc-linaro-$(LINARO_GCC_VERSION)-$(LINARO_RELEASE).tar.bz2
+ GCC_PATCH_DIR:=toolchain/gcc/linaro/$(LINARO_RELEASE)-$(LINARO_GCC_VERSION)
+ GCC_DIR:=$(TOOLCHAIN_DIR)/gcc-linaro-$(LINARO_GCC_VERSION)-$(LINARO_RELEASE)
+else
+ GCC_SOURCE:=gcc-$(GCC_VERSION).tar.bz2
+ GCC_PATCH_DIR:=toolchain/gcc/$(GCC_VERSION)
+ GCC_DIR:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)
+endif
 GCC_CAT:=$(BZCAT)
 GCC_STRIP_HOST_BINARIES:=nope
 GCC_SRC_DIR:=$(GCC_DIR)
@@ -225,6 +235,37 @@ else
 GCC_TLS:=--disable-tls
 endif
 
+ifeq ($(BR2_GCC_ENABLE_LTO),y)
+GCC_LTO:=--enable-lto
+else
+GCC_LTO:=--disable-lto
+endif
+
+ifeq ($(BR2_GCC_ENABLE_GRAPHITE),y)
+ifeq ($(findstring x4.6.,x$(GCC_VERSION)),x4.6.)
+GCC_WITH_HOST_PPL = --with-ppl=$(HOST_DIR)/usr
+GCC_TARGET_PREREQ += ppl
+ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
+HOST_SOURCE += host-ppl-source
+endif
+GCC_HOST_PREREQ += host-ppl
+GCC_WITH_HOST_CLOOG = --with-cloog=$(HOST_DIR)/usr --enable-cloog-backend=isl
+GCC_TARGET_PREREQ += cloog
+ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
+HOST_SOURCE += host-cloog-source
+endif
+GCC_HOST_PREREQ += host-cloog
+endif
+ifeq ($(findstring x4.7.,x$(GCC_VERSION)),x4.7.)
+GCC_WITH_HOST_CLOOG = --with-cloog=$(HOST_DIR)/usr --disable-cloog-version-check --enable-cloog-backend=isl
+GCC_TARGET_PREREQ += cloog
+ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
+HOST_SOURCE += host-cloog-source
+endif
+GCC_HOST_PREREQ += host-cloog
+endif
+endif
+
 ifeq ($(BR2_PTHREADS_NONE),y)
 THREADS:=--disable-threads
 else
@@ -301,9 +342,12 @@ $(GCC_BUILD_DIR1)/.configured: $(GCC_DIR)/.patched
 		--with-newlib \
 		--disable-multilib \
 		$(GCC_TLS) \
+		$(GCC_LTO) \
 		$(GCC_WITH_HOST_GMP) \
 		$(GCC_WITH_HOST_MPFR) \
 		$(GCC_WITH_HOST_MPC) \
+		$(GCC_WITH_HOST_PPL) \
+		$(GCC_WITH_HOST_CLOOG) \
 		$(DISABLE_NLS) \
 		$(THREADS) \
 		$(GCC_DECIMAL_FLOAT) \
@@ -365,9 +409,12 @@ $(GCC_BUILD_DIR2)/.configured: $(GCC_DIR)/.patched
 		--disable-libssp \
 		--disable-multilib \
 		$(GCC_TLS) \
+		$(GCC_LTO) \
 		$(GCC_WITH_HOST_GMP) \
 		$(GCC_WITH_HOST_MPFR) \
 		$(GCC_WITH_HOST_MPC) \
+		$(GCC_WITH_HOST_PPL) \
+		$(GCC_WITH_HOST_CLOOG) \
 		$(DISABLE_NLS) \
 		$(THREADS) \
 		$(MULTILIB) \
@@ -441,10 +488,13 @@ $(GCC_BUILD_DIR3)/.configured: $(GCC_SRC_DIR)/.patched $(GCC_STAGING_PREREQ)
 		--disable-libssp \
 		--disable-multilib \
 		$(GCC_TLS) \
+		$(GCC_LTO) \
 		$(GCC_SHARED_LIBGCC) \
 		$(GCC_WITH_HOST_GMP) \
 		$(GCC_WITH_HOST_MPFR) \
 		$(GCC_WITH_HOST_MPC) \
+		$(GCC_WITH_HOST_PPL) \
+		$(GCC_WITH_HOST_CLOOG) \
 		$(DISABLE_NLS) \
 		$(THREADS) \
 		$(GCC_DECIMAL_FLOAT) \
@@ -572,6 +622,7 @@ $(GCC_BUILD_DIR4)/.configured: $(GCC_BUILD_DIR4)/.prepared
 		--disable-libssp \
 		--disable-multilib \
 		$(GCC_TLS) \
+		$(GCC_LTO) \
 		$(GCC_SHARED_LIBGCC) \
 		$(DISABLE_NLS) \
 		$(THREADS) \

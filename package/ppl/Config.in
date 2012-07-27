@@ -1,0 +1,6 @@
+config BR2_PACKAGE_PPL
+	bool "ppl"
+	help
+	  The Parma Polyhedra Library.
+
+	  http://bugseng.com/products/ppl/

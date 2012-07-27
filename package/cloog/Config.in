@@ -1,0 +1,6 @@
+config BR2_PACKAGE_CLOOG
+	bool "cloog"
+	help
+	  The CLooG Code Generator in the Polyhedral Model.
+
+	  http://www.cloog.org/
