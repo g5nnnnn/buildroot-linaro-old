@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2012.08-rc1
+export BR2_VERSION:=2012.08-rc2
 
 # Check for minimal make version (note: this check will break at make 10.x)
 MIN_MAKE_VERSION=3.81
@@ -209,6 +209,7 @@ unexport CFLAGS
 unexport CXXFLAGS
 unexport GREP_OPTIONS
 unexport CONFIG_SITE
+unexport QMAKESPEC
 
 GNU_HOST_NAME:=$(shell support/gnuconfig/config.guess)
 
