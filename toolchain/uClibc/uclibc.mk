@@ -38,7 +38,6 @@ UCLIBC_TARGET_ARCH:=$(shell $(SHELL) -c "echo $(ARCH) | sed \
 		-e 's/sh[234].*/sh/' \
 		-e 's/mips.*/mips/' \
 		-e 's/cris.*/cris/' \
-		-e 's/xtensa.*/xtensa/' \
 ")
 
 UCLIBC_TARGET_ENDIAN:=$(call qstrip,$(BR2_ENDIAN))
@@ -49,8 +48,8 @@ else
 UCLIBC_NOT_TARGET_ENDIAN:=LITTLE
 endif
 
-UCLIBC_ARM_TYPE:=CONFIG_$(call qstrip,$(BR2_ARM_TYPE))
-UCLIBC_SPARC_TYPE:=CONFIG_SPARC_$(call qstrip,$(BR2_SPARC_TYPE))
+UCLIBC_ARM_TYPE:=CONFIG_$(call qstrip,$(BR2_UCLIBC_ARM_TYPE))
+UCLIBC_SPARC_TYPE:=CONFIG_SPARC_$(call qstrip,$(BR2_UCLIBC_SPARC_TYPE))
 
 ifeq ($(GENERATE_LOCALE),)
 # We need at least one locale

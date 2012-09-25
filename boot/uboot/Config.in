@@ -9,12 +9,17 @@ config BR2_TARGET_UBOOT_BOARDNAME
 	help
 	  One of U-Boot supported boards to be built.
 	  This will be suffixed with _config to meet U-Boot standard naming.
+	  See boards.cfg in U-Boot source code for the list of available
+	  configurations.
 
 choice
 	prompt "U-Boot Version"
-	default BR2_TARGET_UBOOT_2012_04
+	default BR2_TARGET_UBOOT_2012_07
 	help
 	  Select the specific U-Boot version you want to use
+
+config BR2_TARGET_UBOOT_2012_07
+	bool "2012.07"
 
 config BR2_TARGET_UBOOT_2012_04
 	bool "2012.04.01"
@@ -50,6 +55,7 @@ endif
 
 config BR2_TARGET_UBOOT_VERSION
 	string
+	default "2012.07"	if BR2_TARGET_UBOOT_2012_07
 	default "2012.04.01"	if BR2_TARGET_UBOOT_2012_04
 	default "2011.12"	if BR2_TARGET_UBOOT_2011_12
 	default "2011.09"	if BR2_TARGET_UBOOT_2011_09
