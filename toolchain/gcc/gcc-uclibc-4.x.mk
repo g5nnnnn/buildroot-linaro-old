@@ -35,12 +35,6 @@ else
  GCC_SITE:=$(BR2_GNU_MIRROR)/gcc/gcc-$(GCC_VERSION)
 endif
 
-<<<<<<< HEAD
-ifneq ($(filter xtensa%,$(ARCH)),)
-include target/xtensa/patch.in
-GCC_PATCH_EXTRA:=$(call XTENSA_PATCH,gcc,$(GCC_PATCH_DIR),. ..)
-endif
-
 ifneq ($(BR2_LINARO_RELEASE),)
  LINARO_GCC_VERSION:=$(call qstrip,$(BR2_LINARO_GCC_VERSION))
  LINARO_RELEASE:=$(call qstrip,$(BR2_LINARO_RELEASE))
@@ -52,11 +46,6 @@ else
  GCC_PATCH_DIR:=toolchain/gcc/$(GCC_VERSION)
  GCC_DIR:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)
 endif
-=======
-GCC_SOURCE:=gcc-$(GCC_VERSION).tar.bz2
-GCC_PATCH_DIR:=toolchain/gcc/$(GCC_VERSION)
-GCC_DIR:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)
->>>>>>> 90f908f21e4f7b1b7dd0c4c44515db67f441dcc3
 GCC_CAT:=$(BZCAT)
 GCC_STRIP_HOST_BINARIES:=nope
 GCC_SRC_DIR:=$(GCC_DIR)
