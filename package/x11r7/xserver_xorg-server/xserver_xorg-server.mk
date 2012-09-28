@@ -121,6 +121,8 @@ endif
 ifeq ($(BR2_PACKAGE_XPROTO_RECORDPROTO),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += xproto_recordproto
 XSERVER_XORG_SERVER_CONF_OPT += --enable-record
+else
+XSERVER_XORG_SERVER_CONF_OPT += --disable-record
 endif
 
 ifneq ($(BR2_PACKAGE_XLIB_LIBXVMC),y)
