@@ -4,6 +4,7 @@ comment "GCC Options"
 
 config BR2_LINARO_GCC
 	depends on BR2_arm
+	depends on BR2_cortex_a8 || BR2_cortex_a9
 	bool "Enable linaro's gcc selection"
 	help
 	  Enable linaro's arm optimize gcc.
