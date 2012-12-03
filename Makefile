@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2012.11-git
+export BR2_VERSION:=2012.11
 
 # Check for minimal make version (note: this check will break at make 10.x)
 MIN_MAKE_VERSION=3.81
@@ -172,6 +172,7 @@ export HOSTCC_NOCCACHE HOSTCXX_NOCCACHE
 
 # Make sure pkg-config doesn't look outside the buildroot tree
 unexport PKG_CONFIG_PATH
+unexport PKG_CONFIG_SYSROOT_DIR
 
 # Having DESTDIR set in the environment confuses the installation
 # steps of some packages.
@@ -269,6 +270,10 @@ LEGAL_LICENSES_TXT=$(LEGAL_INFO_DIR)/licenses.txt
 LEGAL_WARNINGS=$(LEGAL_INFO_DIR)/.warnings
 LEGAL_REPORT=$(LEGAL_INFO_DIR)/README
 
+# Location of a file giving a big fat warning that output/target
+# should not be used as the root filesystem.
+TARGET_DIR_WARNING_FILE=$(TARGET_DIR)/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
+
 ifeq ($(BR2_CCACHE),y)
 CCACHE:=$(HOST_DIR)/usr/bin/ccache
 BUILDROOT_CACHE_DIR = $(call qstrip,$(BR2_CCACHE_DIR))
@@ -285,6 +290,12 @@ endif
 #############################################################
 
 all: world
+
+# Include legacy before the other things, because package .mk files
+# may rely on it.
+ifneq ($(BR2_DEPRECATED),y)
+include Makefile.legacy
+endif
 
 include package/Makefile.in
 include support/dependencies/dependencies.mk
@@ -403,6 +414,7 @@ $(BUILD_DIR)/.root:
 			cp -fa $(TARGET_SKELETON)/* $(TARGET_DIR)/; \
 		fi; \
 	fi
+	cp support/misc/target-dir-warning.txt $(TARGET_DIR_WARNING_FILE)
 	-find $(TARGET_DIR) -type d -name CVS -print0 -o -name .svn -print0 | xargs -0 rm -rf
 	-find $(TARGET_DIR) -type f \( -name .empty -o -name '*~' \) -print0 | xargs -0 rm -rf
 	touch $@
@@ -414,7 +426,7 @@ ifneq (,$(call qstrip,$(BR2_STRIP_EXCLUDE_DIRS)))
 STRIP_FIND_CMD += \( $(call finddirclauses,$(TARGET_DIR),$(call qstrip,$(BR2_STRIP_EXCLUDE_DIRS))) \) -prune -o
 endif
 STRIP_FIND_CMD += -type f -perm +111
-STRIP_FIND_CMD += -not \( $(call findfileclauses,libthread_db*.so* $(call qstrip,$(BR2_STRIP_EXCLUDE_FILES))) \) -print
+STRIP_FIND_CMD += -not \( $(call findfileclauses,libpthread*.so* $(call qstrip,$(BR2_STRIP_EXCLUDE_FILES))) \) -print
 
 target-finalize:
 ifeq ($(BR2_HAVE_DEVFILES),y)
@@ -445,6 +457,14 @@ endif
 	find $(TARGET_DIR)/lib/modules -type f -name '*.ko' | \
 		xargs -r $(KSTRIPCMD) || true
 
+# See http://sourceware.org/gdb/wiki/FAQ, "GDB does not see any threads
+# besides the one in which crash occurred; or SIGTRAP kills my program when
+# I set a breakpoint"
+ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
+	find $(TARGET_DIR)/lib -type f -name 'libpthread*.so*' | \
+		xargs $(STRIPCMD) $(STRIP_STRIP_DEBUG) || true
+endif
+
 	mkdir -p $(TARGET_DIR)/etc
 	# Mandatory configuration file and auxilliary cache directory
 	# for recent versions of ldconfig
@@ -465,8 +485,9 @@ endif
 	) >  $(TARGET_DIR)/etc/os-release
 
 ifneq ($(BR2_ROOTFS_POST_BUILD_SCRIPT),"")
-	@$(call MESSAGE,"Executing post-build script")
-	$(BR2_ROOTFS_POST_BUILD_SCRIPT) $(TARGET_DIR)
+	@$(call MESSAGE,"Executing post-build script\(s\)")
+	@$(foreach s, $(call qstrip,$(BR2_ROOTFS_POST_BUILD_SCRIPT)), \
+		$(s) $(TARGET_DIR)$(sep))
 endif
 
 ifeq ($(BR2_ENABLE_LOCALE_PURGE),y)
@@ -599,6 +620,9 @@ allnoconfig: $(BUILD_DIR)/buildroot-config/conf outputmakefile
 randpackageconfig: $(BUILD_DIR)/buildroot-config/conf outputmakefile
 	@mkdir -p $(BUILD_DIR)/buildroot-config
 	@grep -v BR2_PACKAGE_ $(CONFIG_DIR)/.config > $(CONFIG_DIR)/.config.nopkg
+	@grep '^config BR2_PACKAGE_' Config.in.legacy | \
+		while read config pkg; do \
+		echo "# $$pkg is not set" >> $(CONFIG_DIR)/.config.nopkg; done
 	@$(COMMON_CONFIG_ENV) \
 		KCONFIG_ALLCONFIG=$(CONFIG_DIR)/.config.nopkg \
 		$< --randconfig $(CONFIG_CONFIG_IN)
@@ -607,6 +631,9 @@ randpackageconfig: $(BUILD_DIR)/buildroot-config/conf outputmakefile
 allyespackageconfig: $(BUILD_DIR)/buildroot-config/conf outputmakefile
 	@mkdir -p $(BUILD_DIR)/buildroot-config
 	@grep -v BR2_PACKAGE_ $(CONFIG_DIR)/.config > $(CONFIG_DIR)/.config.nopkg
+	@grep '^config BR2_PACKAGE_' Config.in.legacy | \
+		while read config pkg; do \
+		echo "# $$pkg is not set" >> $(CONFIG_DIR)/.config.nopkg; done
 	@$(COMMON_CONFIG_ENV) \
 		KCONFIG_ALLCONFIG=$(CONFIG_DIR)/.config.nopkg \
 		$< --allyesconfig $(CONFIG_CONFIG_IN)
@@ -756,4 +783,3 @@ print-version:
 include docs/manual/manual.mk
 
 .PHONY: $(noconfig_targets)
-
