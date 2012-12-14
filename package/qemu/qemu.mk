@@ -4,7 +4,7 @@
 #
 #############################################################
 
-QEMU_VERSION = 1.2.0
+QEMU_VERSION = 1.2.1
 QEMU_SOURCE = qemu-$(QEMU_VERSION).tar.bz2
 QEMU_SITE = http://wiki.qemu.org/download
 QEMU_LICENSE = GPLv2 LGPLv2.1 MIT BSD-3c BSD-2c Others/BSD-1c
@@ -13,7 +13,10 @@ QEMU_LICENSE_FILES = COPYING COPYING.LIB
 #       the non-(L)GPL license texts are specified in the affected
 #       individual source files.
 
-QEMU_DEPENDENCIES = host-pkgconf zlib libglib2
+#-------------------------------------------------------------
+# Host-qemu
+
+HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2
 
 #       BR ARCH         qemu
 #       -------         ----
@@ -44,20 +47,20 @@ QEMU_DEPENDENCIES = host-pkgconf zlib libglib2
 #       sh64            not supported
 #       sparc           sparc
 
-QEMU_ARCH = $(ARCH)
-ifeq ($(QEMU_ARCH),i486)
-    QEMU_ARCH = i386
+HOST_QEMU_ARCH = $(ARCH)
+ifeq ($(HOST_QEMU_ARCH),i486)
+    HOST_QEMU_ARCH = i386
 endif
-ifeq ($(QEMU_ARCH),i586)
-    QEMU_ARCH = i386
+ifeq ($(HOST_QEMU_ARCH),i586)
+    HOST_QEMU_ARCH = i386
 endif
-ifeq ($(QEMU_ARCH),i686)
-    QEMU_ARCH = i386
+ifeq ($(HOST_QEMU_ARCH),i686)
+    HOST_QEMU_ARCH = i386
 endif
-ifeq ($(QEMU_ARCH),powerpc)
-    QEMU_ARCH = ppc
+ifeq ($(HOST_QEMU_ARCH),powerpc)
+    HOST_QEMU_ARCH = ppc
 endif
-HOST_QEMU_TARGETS=$(QEMU_ARCH)-linux-user
+HOST_QEMU_TARGETS=$(HOST_QEMU_ARCH)-linux-user
 
 define HOST_QEMU_CONFIGURE_CMDS
 	(cd $(@D); $(HOST_CONFIGURE_OPTS) ./configure   \
