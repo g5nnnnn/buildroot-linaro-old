@@ -4,7 +4,7 @@
 #
 #############################################################
 
-GETTEXT_VERSION = 0.18.1.1
+GETTEXT_VERSION = 0.18.2
 GETTEXT_SITE = $(BR2_GNU_MIRROR)/gettext
 GETTEXT_INSTALL_STAGING = YES
 GETTEXT_LICENSE = GPLv2+
@@ -44,6 +44,12 @@ define GETTEXT_DISABLE_TOOLS
 endef
 endif # GETTEXT_TOOLS = n
 
+# The tools tests build fails with full toolchain without threads
+define GETTEXT_DISABLE_TESTS
+	$(SED) 's/m4 tests/m4/' $(@D)/gettext-tools/Makefile.in
+endef
+
 GETTEXT_POST_PATCH_HOOKS += GETTEXT_DISABLE_TOOLS
+GETTEXT_POST_PATCH_HOOKS += GETTEXT_DISABLE_TESTS
 
 $(eval $(autotools-package))
