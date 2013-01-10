@@ -70,4 +70,28 @@ config BR2_PACKAGE_INPUT_TOOLS_EVTEST
 	help
 	  The evtest program from input-tools is now a separate package.
 
+config BR2_PACKAGE_PTHREAD_STUBS
+	bool "pthread-stubs option has been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_XLIB_LIBPTHREAD_STUBS
+	help
+	  For consistency reason, the pthread-stubs package has been
+	  renamed to xlib_libpthread-stubs.
+
+config BR2_PACKAGE_XSERVER_xorg
+	bool "X.org modular server"
+	select BR2_LEGACY
+	select BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+	help
+	  The option has been renamed
+	  BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR.
+
+config BR2_PACKAGE_XSERVER_tinyx
+	bool "KDrive / TinyX server"
+	select BR2_LEGACY
+	select BR2_PACKAGE_XSERVER_XORG_SERVER_KDRIVE
+	help
+	  The option has been renamed
+	  BR2_PACKAGE_XSERVER_XORG_SERVER_KDRIVE.
+
 endif

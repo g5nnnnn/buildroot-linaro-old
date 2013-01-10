@@ -62,21 +62,40 @@ XSERVER_XORG_SERVER_CONF_OPT = --disable-config-hal \
 		--with-fontdir=/usr/share/fonts/X11/ --localstatedir=/var \
 		--$(if $(BR2_PACKAGE_XSERVER_XORG_SERVER_XVFB),en,dis)able-xvfb
 
-ifeq ($(BR2_PACKAGE_XSERVER_xorg),y)
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR),y)
 XSERVER_XORG_SERVER_CONF_OPT += --enable-xorg
 XSERVER_XORG_SERVER_DEPENDENCIES += xlib_libpciaccess libdrm
 else
 XSERVER_XORG_SERVER_CONF_OPT += --disable-xorg
 endif
 
-ifeq ($(BR2_PACKAGE_XSERVER_tinyx),y)
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_KDRIVE),y)
 XSERVER_XORG_SERVER_CONF_OPT += --enable-kdrive --enable-xfbdev \
 		--disable-glx --disable-dri --disable-xsdl
 define XSERVER_CREATE_X_SYMLINK
  ln -f -s Xfbdev $(TARGET_DIR)/usr/bin/X
 endef
 XSERVER_XORG_SERVER_POST_INSTALL_TARGET_HOOKS += XSERVER_CREATE_X_SYMLINK
+
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_KDRIVE_EVDEV),y)
+XSERVER_XORG_SERVER_CONF_OPT += --enable-kdrive-evdev
 else
+XSERVER_XORG_SERVER_CONF_OPT += --disable-kdrive-evdev
+endif
+
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_KDRIVE_KBD),y)
+XSERVER_XORG_SERVER_CONF_OPT += --enable-kdrive-kbd
+else
+XSERVER_XORG_SERVER_CONF_OPT += --disable-kdrive-kbd
+endif
+
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_KDRIVE_MOUSE),y)
+XSERVER_XORG_SERVER_CONF_OPT += --enable-kdrive-mouse
+else
+XSERVER_XORG_SERVER_CONF_OPT += --disable-kdrive-mouse
+endif
+
+else # modular
 XSERVER_XORG_SERVER_CONF_OPT += --disable-kdrive --disable-xfbdev
 endif
 
@@ -133,7 +152,7 @@ ifneq ($(BR2_PACKAGE_XLIB_LIBXCOMPOSITE),y)
 XSERVER_XORG_SERVER_CONF_OPT += --disable-composite
 endif
 
-ifeq ($(BR2_PACKAGE_XSERVER_xorg),y)
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR),y)
 ifeq ($(BR2_PACKAGE_XPROTO_DRI2PROTO),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += xproto_dri2proto
 XSERVER_XORG_SERVER_CONF_OPT += --enable-dri2
