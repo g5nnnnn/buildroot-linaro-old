@@ -1,12 +1,15 @@
 #############################################################
 #
-# gzip
+# ncdu
 #
 #############################################################
 
-GZIP_VERSION = 1.5
-GZIP_SITE = $(BR2_GNU_MIRROR)/gzip
-GZIP_LICENSE = GPLv3+
-GZIP_LICENSE_FILES = COPYING
+NCDU_VERSION = 1.9
+NCDU_SITE = http://dev.yorhel.nl/download/
+
+NCDU_DEPENDENCIES = ncurses
+
+NCDU_LICENSE = MIT
+NCDU_LICENSE_FILES = COPYING
 
 $(eval $(autotools-package))
