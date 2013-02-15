@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2013.02
+export BR2_VERSION:=2013.02-rc1
 
 # Check for minimal make version (note: this check will break at make 10.x)
 MIN_MAKE_VERSION=3.81
@@ -353,6 +353,8 @@ endif
 
 include fs/common.mk
 
+TARGETS+=target-post-image
+
 TARGETS_CLEAN:=$(patsubst %,%-clean,$(TARGETS))
 TARGETS_SOURCE:=$(patsubst %,%-source,$(TARGETS) $(BASE_TARGETS))
 TARGETS_DIRCLEAN:=$(patsubst %,%-dirclean,$(TARGETS))
@@ -504,7 +506,8 @@ endif
 	@for dir in $(call qstrip,$(BR2_ROOTFS_OVERLAY)); do \
 		$(call MESSAGE,"Copying overlay $${dir}"); \
 		rsync -a \
-			--exclude .svn --exclude .git --exclude .hg --exclude '*~' \
+			--exclude .empty --exclude .svn --exclude .git \
+			--exclude .hg --exclude '*~' \
 			$${dir}/ $(TARGET_DIR); \
 	done
 
@@ -553,6 +556,13 @@ target-generatelocales: host-localedef
 			-i $${inputfile} -f $${charmap} \
 			$${locale} ; \
 	done
+endif
+
+target-post-image:
+ifneq ($(BR2_ROOTFS_POST_IMAGE_SCRIPT),"")
+	@$(call MESSAGE,"Executing post-image script\(s\)")
+	@$(foreach s, $(call qstrip,$(BR2_ROOTFS_POST_IMAGE_SCRIPT)), \
+		$(s) $(BINARIES_DIR)$(sep))
 endif
 
 toolchain-eclipse-register:
