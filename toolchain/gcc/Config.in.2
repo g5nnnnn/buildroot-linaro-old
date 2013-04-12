@@ -10,6 +10,7 @@ config BR2_PACKAGE_GCC_TARGET
 	select BR2_PACKAGE_GMP
 	select BR2_PACKAGE_PPL if (BR2_GCC_ENABLE_GRAPHITE && (BR2_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_6_X))
 	select BR2_PACKAGE_CLOOG if (BR2_GCC_ENABLE_GRAPHITE)
+	select BR2_PACKAGE_ISL if (BR2_GCC_ENABLE_GRAPHITE && (BR2_GCC_VERSION_4_8_X || BR2_LINARO_GCC_VERSION_4_8_X))
 	help
 	  If you want the target system to be able to run
 	  binutils/gcc and compile native code, say Y here.

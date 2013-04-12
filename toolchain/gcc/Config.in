@@ -59,15 +59,23 @@ choice
 
 	config BR2_LINARO_GCC_VERSION_4_5_X
 		depends on BR2_LINARO_GCC
+		select BR2_GCC_NEEDS_MPC
 		bool "linaro's gcc 4.5.x"
 
 	config BR2_LINARO_GCC_VERSION_4_6_X
 		depends on BR2_LINARO_GCC
+		select BR2_GCC_NEEDS_MPC
 		bool "linaro's gcc 4.6.x"
 
 	config BR2_LINARO_GCC_VERSION_4_7_X
 		depends on BR2_LINARO_GCC
+		select BR2_GCC_NEEDS_MPC
 		bool "linaro's gcc 4.7.x"
+
+	config BR2_LINARO_GCC_VERSION_4_8_X
+		depends on BR2_LINARO_GCC
+		select BR2_GCC_NEEDS_MPC
+		bool "linaro's gcc 4.8.x"
 endchoice
 
 config BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE
@@ -96,7 +104,7 @@ config BR2_GCC_VERSION
 	default "4.5.4"     if BR2_GCC_VERSION_4_5_X || BR2_LINARO_GCC_VERSION_4_5_X
 	default "4.6.3"     if BR2_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_6_X
 	default "4.7.3"     if BR2_GCC_VERSION_4_7_X || BR2_LINARO_GCC_VERSION_4_7_X
-	default "4.8.0"     if BR2_GCC_VERSION_4_8_X
+	default "4.8.0"     if BR2_GCC_VERSION_4_8_X || BR2_LINARO_GCC_VERSION_4_8_X
 	default $BR2_GCC_SNAP_DATE if BR2_GCC_VERSION_SNAP
 
 config BR2_LINARO_GCC_VERSION
@@ -104,10 +112,12 @@ config BR2_LINARO_GCC_VERSION
 	default "4.5"     if BR2_LINARO_GCC_VERSION_4_5_X
 	default "4.6"     if BR2_LINARO_GCC_VERSION_4_6_X
 	default "4.7"     if BR2_LINARO_GCC_VERSION_4_7_X
+	default "4.8"     if BR2_LINARO_GCC_VERSION_4_8_X
 
 config BR2_LINARO_RELEASE
 	string
 	default "2013.03"     if BR2_LINARO_GCC_VERSION_4_5_X || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X
+	default "2013.04"     if BR2_LINARO_GCC_VERSION_4_8_X
 
 config BR2_EXTRA_GCC_CONFIG_OPTIONS
 	string "Additional gcc options"
@@ -149,14 +159,14 @@ config BR2_GCC_ENABLE_TLS
 config BR2_GCC_ENABLE_LTO
         bool "Enable compiler lto support"
 	default y
-        depends on BR2_GCC_VERSION_4_6_X || BR2_GCC_VERSION_4_7_X || BR2_GCC_VERSION_SNAP || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X
+        depends on BR2_GCC_VERSION_4_6_X || BR2_GCC_VERSION_4_7_X || BR2_GCC_VERSION_4_8_X || BR2_GCC_VERSION_SNAP || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X || BR2_LINARO_GCC_VERSION_4_8_X
         help
           Enable Link Time Optimization support for the compiler
 	  Need libelf v0.8.12 or newer installed on host system
 
 config BR2_GCC_ENABLE_GRAPHITE
         bool "Enable compiler graphite support"
-        depends on BR2_GCC_VERSION_4_6_X || BR2_GCC_VERSION_4_7_X || BR2_GCC_VERSION_SNAP || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X
+        depends on BR2_GCC_VERSION_4_6_X || BR2_GCC_VERSION_4_7_X || BR2_GCC_VERSION_4_8_X || BR2_GCC_VERSION_SNAP || BR2_LINARO_GCC_VERSION_4_6_X || BR2_LINARO_GCC_VERSION_4_7_X || BR2_LINARO_GCC_VERSION_4_8_X
         help
           Enable Graphite support for the compiler
 
