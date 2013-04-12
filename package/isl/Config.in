@@ -1,0 +1,6 @@
+config BR2_PACKAGE_ISL
+	bool "isl"
+	help
+	  isl is a library for manipulating sets and relations of integer points bounded by linear constraints.
+
+	  http://freecode.com/projects/isl
