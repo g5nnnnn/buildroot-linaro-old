@@ -32,7 +32,7 @@ else ifeq ($(findstring avr32,$(GCC_VERSION)),avr32)
 else ifneq ($(BR2_LINARO_RELEASE),)
  GCC_SITE:=http://launchpad.net/gcc-linaro/$(BR2_LINARO_GCC_VERSION)/$(BR2_LINARO_GCC_VERSION)-$(BR2_LINARO_RELEASE)/+download/
 else
- GCC_SITE:=$(BR2_GNU_MIRROR)/gcc/gcc-$(GCC_VERSION)
+ GCC_SITE:=$(BR2_GNU_MIRROR:/=)/gcc/gcc-$(GCC_VERSION)
 endif
 
 ifneq ($(BR2_LINARO_RELEASE),)
@@ -267,7 +267,7 @@ endif
 $(DL_DIR)/$(GCC_SOURCE):
 	mkdir -p $(DL_DIR)
 	$(Q)$(call MESSAGE,"Downloading gcc")
-	$(call DOWNLOAD,$(GCC_SITE)/$(GCC_SOURCE))
+	$(call DOWNLOAD,$(GCC_SITE:/=)/$(GCC_SOURCE))
 
 gcc-unpacked: $(GCC_DIR)/.patched
 $(GCC_DIR)/.unpacked: $(DL_DIR)/$(GCC_SOURCE)
