@@ -29,6 +29,8 @@ ifneq ($(GCC_SNAP_DATE),)
  GCC_SITE:=ftp://gcc.gnu.org/pub/gcc/snapshots/$(GCC_SNAP_DATE)/
 else ifeq ($(findstring avr32,$(GCC_VERSION)),avr32)
  GCC_SITE:=ftp://www.at91.com/pub/buildroot/
+else ifeq ($(findstring arc,$(GCC_VERSION)),arc)
+ GCC_SITE:=$(BR2_ARC_SITE)
 else ifneq ($(BR2_LINARO_RELEASE),)
  GCC_SITE:=http://launchpad.net/gcc-linaro/$(BR2_LINARO_GCC_VERSION)/$(BR2_LINARO_GCC_VERSION)-$(BR2_LINARO_RELEASE)/+download/
 else
@@ -73,7 +75,11 @@ endif
 
 # Determine soft-float options
 ifeq ($(BR2_SOFT_FLOAT),y)
+# only mips*-*-*, arm*-*-* and sparc*-*-* accept --with-float
+# powerpc seems to be needing it as well
+ifeq ($(BR2_arm)$(BR2_armeb)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el)$(BR2_powerpc)$(BR2_sparc),y)
 SOFT_FLOAT_CONFIG_OPTION:=--with-float=soft
+endif
 ifeq ($(BR2_arm)$(BR2_armeb),y) # only set float-abi for arm
 TARGET_SOFT_FLOAT:=-mfloat-abi=soft
 else
@@ -95,7 +101,11 @@ ifneq ($(call qstrip,$(BR2_GCC_TARGET_ABI)),)
 GCC_WITH_ABI:=--with-abi=$(BR2_GCC_TARGET_ABI)
 endif
 ifneq ($(call qstrip,$(BR2_GCC_TARGET_CPU)),)
-GCC_WITH_CPU:=--with-cpu=$(BR2_GCC_TARGET_CPU)
+ifneq ($(call qstrip,$(BR2_GCC_TARGET_CPU_REVISION)),)
+GCC_WITH_CPU:=--with-cpu=$(call qstrip,$(BR2_GCC_TARGET_CPU)-$(BR2_GCC_TARGET_CPU_REVISION))
+else
+GCC_WITH_CPU:=--with-cpu=$(call qstrip,$(BR2_GCC_TARGET_CPU))
+endif
 endif
 
 # AVR32 GCC special configuration
