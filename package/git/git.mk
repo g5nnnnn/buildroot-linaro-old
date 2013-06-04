@@ -8,10 +8,7 @@ GIT_VERSION         = 1.8.3
 GIT_SITE            = http://git-core.googlecode.com/files/
 GIT_LICENSE         = GPLv2 LGPLv2.1+
 GIT_LICENSE_FILES   = COPYING LGPL-2.1
-
-ifeq ($(BR2_PACKAGE_ZLIB),y)
-	GIT_DEPENDENCIES += zlib
-endif
+GIT_DEPENDENCIES    = zlib host-gettext
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
 	GIT_DEPENDENCIES += openssl
@@ -43,6 +40,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_LIBICONV),y)
 	GIT_DEPENDENCIES += libiconv
+	GIT_CONF_ENV += LIBS=-liconv
 	GIT_CONF_OPT += --with-iconv=/usr/lib
 else
 	GIT_CONF_OPT += --without-iconv
@@ -57,7 +55,7 @@ endif
 
 # assume yes for these tests, configure will bail out otherwise
 # saying error: cannot run test program while cross compiling
-GIT_CONF_ENV = 	ac_cv_fread_reads_directories=yes \
+GIT_CONF_ENV += ac_cv_fread_reads_directories=yes \
 	ac_cv_snprintf_returns_bogus=yes
 
 $(eval $(autotools-package))
