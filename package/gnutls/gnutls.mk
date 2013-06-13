@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # gnutls
 #
-#############################################################
+################################################################################
 
 GNUTLS_VERSION = 3.2.1
 GNUTLS_SOURCE = gnutls-$(GNUTLS_VERSION).tar.xz
@@ -44,7 +44,6 @@ endif
 
 # libidn support for nommu must exclude the crywrap wrapper (uses fork)
 GNUTLS_CONF_OPT += $(if $(BR2_USE_MMU),,--disable-crywrap)
-GNUTLS_DEPENDENCIES += $(if $(BR2_PACKAGE_LIBIDN),libidn)
 
 ifeq ($(BR2_PACKAGE_CRYPTODEV_LINUX),y)
 	GNUTLS_CONF_OPT += --enable-cryptodev
